@@ -1,0 +1,205 @@
+openapi: "3.0.0"
+info:
+  description: "Backend for react application"
+  version: "0.0.1" 
+  title: "backend"
+
+servers: 
+  - url: "http://localhost:8810"
+tags:
+  - name: maintenance
+    description: Maintenance operation
+  - name: "user"
+    description: "Operations about user"
+
+paths:
+  /users:
+    x-router-controller: routes.config
+    get:
+      operationId: getUsers_R
+      summary: Get all users saved in the database
+
+      tags:
+        - user
+
+      responses:
+        "200":
+          description: "Request ran successfuly"
+
+        500:
+          description: Internal server error
+
+    post:
+      operationId: addUser_R
+      summary: Add a new user to the database
+
+      tags:
+        - user
+
+      requestBody:
+        description: The content of the update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserData'
+
+      responses:
+        201:
+          description: User created successfully
+
+        500:
+          description: Internal server error
+
+  /users/{email}:
+    x-router-controller: routes.config
+    put:
+      operationId: updateUser_R
+      summary: Update a user in the database
+      
+      tags:
+        - user
+
+      parameters:
+        - in: path
+          name: email
+          schema:
+            type: string
+          required: true
+          description: user mail to update (url encoded)
+
+      requestBody:
+        description: The content of the update
+        content:
+          application/json:
+            schema:
+              anyOf:
+                - $ref: '#/components/schemas/UserData'
+
+      responses:
+        200:
+          description: User updated successfully
+
+        500:
+          description: Internal server error
+
+    delete:
+      operationId: deleteUser_R
+      summary: Delete a user from the database
+
+      tags:
+        - user
+
+      parameters:
+        - in: path
+          name: email
+          schema:
+            type: string
+          required: true
+          description: user mail to delete (url encoded)
+
+      responses:
+        200:
+          description: User updated successfully
+
+        500:
+          description: Internal server error
+
+
+  /health:
+    x-router-controller: routes.config
+    get:
+      operationId: health_R
+      summary: Check server's avilablity
+      
+      tags:
+        - maintenance
+      
+      responses:
+        200:
+          description: Response OK
+        
+components:
+  schemas:
+    PictureObject:
+      type: object
+
+      required:
+        - large
+        - thumbnail
+
+      properties:
+        large:
+          type: string
+
+        thumbnail:
+          type: string
+
+    DateObject:
+      type: object
+
+      required:
+        - date
+        - age
+
+      properties:
+        date:
+          type: string
+        age:
+          type: integer
+
+    StreetObject:
+      type: object
+      
+      required:
+        - number
+        - name
+
+      properties:
+        number:
+          type: integer
+        name:
+          type: string
+
+    AddressObject:
+      type: object
+
+      required:
+        - street
+        - city
+        - state
+        - country
+
+      properties:
+        street:
+          $ref: '#/components/schemas/StreetObject'
+
+        city:
+          type: string
+
+        state:
+          type: string
+
+        country:
+          type: string
+
+    UserData: 
+      type: object
+
+      required:
+        - email
+
+      properties:
+        name:
+          type: string
+        gender:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        picture:
+          $ref: '#/components/schemas/PictureObject'
+        dob:
+          $ref: '#/components/schemas/DateObject'
+        address:
+          $ref: '#/components/schemas/AddressObject'
